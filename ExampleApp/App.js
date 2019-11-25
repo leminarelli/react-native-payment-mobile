@@ -192,7 +192,7 @@ export default class App extends Component {
 
     payNowButtonPress() {
         this.setState({loading: true});
-        this.paymentMobile.submitTransaction()
+        await this.paymentMobile.submitTransaction()
         .then(() => {
             return PaymentMobile.getPaymentStatus(
                 transaction.url,

@@ -4,7 +4,6 @@
 
 @interface RCT_EXTERN_MODULE(PaymentMobile, RCTEventEmitter)
 
-RCT_EXTERN_METHOD(initPaymentProvider:(NSString *)mode)
 RCT_EXTERN_METHOD(setUrlScheme:(NSString *)urlScheme)
 RCT_EXTERN_METHOD(createTransaction:(NSString *)checkoutID paymentBrand:(NSString *)paymentBrand cardHolder:(NSString *)cardHolder cardNumber:(NSString *)cardNumber cardExpiryMonth:(NSString *)cardExpiryMonth cardExpiryYear:(NSString *)cardExpiryYear cardCVV:(NSString *)cardCVV resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(createTransactionWithToken:(NSString *)checkoutID paymentBrand:(NSString *)paymentBrand tokenID:(NSString *)tokenID cardCVV:(NSString *)cardCVV resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)

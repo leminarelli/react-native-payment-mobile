@@ -11,7 +11,7 @@ import { Input, Button, Text } from 'react-native-elements';
 
 const transaction =  {
     amount: 234.34,
-    currency: 'ZAR',
+    currency: 'EUR',
     paymentType: 'DB',
     testMode: 'INTERNAL',
     url: 'https://test.oppwa.com'

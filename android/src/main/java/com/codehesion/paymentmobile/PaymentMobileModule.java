@@ -72,23 +72,7 @@ public class PaymentMobileModule extends ReactContextBaseJavaModule implements S
 
     @ReactMethod
     public void initPaymentProvider(String mode) {
-
-        if (binder != null) {
-            try {
-                if (mode.equals("live")) {
-                    binder.initializeProvider(ProviderMode.LIVE);
-                    Log.i("Provider Initialized", "Initialized provider in Live mode.");
-                } else {
-                    binder.initializeProvider(ProviderMode.TEST);
-                    Log.i("Provider Initialized", "Initialized provider in Test mode.");
-                }
-                binder.addTransactionListener(PaymentMobileModule.this);
-            } catch (PaymentException error) {
-                Log.e("PaymentException", "Failed to initialize payment provider");
-            }
-        } else {
-            Log.e("PaymentException", "Failed to initialize payment provider. Binder is undefined");
-        }
+        this.mode = mode;
     }
 
     @ReactMethod

@@ -20,13 +20,7 @@ class PaymentMobile: RCTEventEmitter {
     var urlScheme: String = ""
     
     @objc func initPaymentProvider(_ mode: String) {
-        var oppProviderMode: OPPProviderMode
-        if (mode == "live") {
-            oppProviderMode = OPPProviderMode.live
-        } else {
-            oppProviderMode = OPPProviderMode.test
-        }
-        self.provider = OPPPaymentProvider.init(mode: oppProviderMode)
+        self.provider = mode
     }
     
     @objc func setUrlScheme(_ urlScheme: String) {

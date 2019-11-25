@@ -71,11 +71,6 @@ public class PaymentMobileModule extends ReactContextBaseJavaModule implements S
     }
 
     @ReactMethod
-    public void initPaymentProvider(String mode) {
-        this.mode = mode;
-    }
-
-    @ReactMethod
     public void setUrlScheme(String urlScheme) {
         this.urlScheme = urlScheme;
     }

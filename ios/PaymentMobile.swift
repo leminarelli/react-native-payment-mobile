@@ -19,10 +19,6 @@ class PaymentMobile: RCTEventEmitter {
     var safariVC: SFSafariViewController?
     var urlScheme: String = ""
     
-    @objc func initPaymentProvider(_ mode: String) {
-        self.provider = mode
-    }
-    
     @objc func setUrlScheme(_ urlScheme: String) {
         self.urlScheme = urlScheme
     }

@@ -1,11 +1,3 @@
-//
-//  PaymentMobile.swift
-//  PaymentMobile
-//
-//  Created by Craig Van Heerden on 2019/09/12.
-//  Copyright © 2019 Facebook. All rights reserved.
-//
-
 import Foundation
 import SafariServices
 
@@ -19,21 +11,31 @@ class PaymentMobile: RCTEventEmitter {
     var safariVC: SFSafariViewController?
     var urlScheme: String = ""
     
+    @objc func initPaymentProvider(_ mode: String) {
+        var oppProviderMode: OPPProviderMode
+        if (mode == "live") {
+            oppProviderMode = OPPProviderMode.live
+        } else {
+            oppProviderMode = OPPProviderMode.test
+        }
+        self.provider = OPPPaymentProvider.init(mode: oppProviderMode)
+    }
+    
     @objc func setUrlScheme(_ urlScheme: String) {
         self.urlScheme = urlScheme
     }
     
-    @objc func createTransaction(_ checkoutID: String, paymentBrand: String, cardHolder: String, cardNumber: String, cardExpiryMonth: String, cardExpiryYear: String, cardCVV: String, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+    @objc func createTransaction(_ checkoutID: String, cardBrand: String, cardHolder: String, cardNumber: String, cardExpiryMonth: String, cardExpiryYear: String, cardCVV: String, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
         if (self.urlScheme == "") {
             reject("", "ShopperResultURL is nil. This probably means you forgot to set it.", NSError(domain: "", code: 3001, userInfo: nil))
             return
         }
 
         do {
-            _ = try createOPPTransaction(checkoutID: checkoutID, paymentBrand: paymentBrand, cardHolder: cardHolder, cardNumber: cardNumber, cardExpiryMonth: cardExpiryMonth, cardExpiryYear: cardExpiryYear, cardCVV: cardCVV)
+            _ = try createOPPTransaction(checkoutID: checkoutID, cardBrand: cardBrand, cardHolder: cardHolder, cardNumber: cardNumber, cardExpiryMonth: cardExpiryMonth, cardExpiryYear: cardExpiryYear, cardCVV: cardCVV)
             resolve([
                 "checkoutID": checkoutID,
-                "paymentBrand": paymentBrand,
+                "cardBrand": cardBrand,
                 "cardHolder": cardHolder,
                 "cardNumber": cardNumber,
                 "cardExpiryMonth": cardExpiryMonth,
@@ -46,13 +48,13 @@ class PaymentMobile: RCTEventEmitter {
         }
     }
 
-    @objc func createTransactionWithToken(_ checkoutID: String, paymentBrand: String, tokenID: String, cardCVV: String?, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
+    @objc func createTransactionWithToken(_ checkoutID: String, cardBrand: String, tokenID: String, cardCVV: String?, resolver resolve: RCTPromiseResolveBlock, rejecter reject: RCTPromiseRejectBlock) {
 
         do {
-            _ = try createOPPTransaction(checkoutID: checkoutID, tokenID: tokenID, paymentBrand: paymentBrand, cvv: cardCVV)
+            _ = try createOPPTransaction(checkoutID: checkoutID, tokenID: tokenID, cardBrand: cardBrand, cvv: cardCVV)
             resolve([
                 "checkoutID": checkoutID,
-                "paymentBrand": paymentBrand,
+                "cardBrand": cardBrand,
                 "tokenID": tokenID,
                 "cardCVV": cardCVV == nil ? "" : cardCVV
                 ])
@@ -71,11 +73,11 @@ class PaymentMobile: RCTEventEmitter {
         do {
             var transaction: OPPTransaction?;
             if (transactionDict["tokenID"] != nil) {
-                transaction = try createOPPTransaction(checkoutID: transactionDict["checkoutID"]!, tokenID: transactionDict["tokenID"]!, paymentBrand: transactionDict["paymentBrand"]!, cvv: transactionDict["cardCVV"]! == "" ? nil : transactionDict["cardCVV"]!)
+                transaction = try createOPPTransaction(checkoutID: transactionDict["checkoutID"]!, tokenID: transactionDict["tokenID"]!, cardBrand: transactionDict["cardBrand"]!, cvv: transactionDict["cardCVV"]! == "" ? nil : transactionDict["cardCVV"]!)
             } else {
                 transaction = try createOPPTransaction(
                     checkoutID: transactionDict["checkoutID"]!,
-                    paymentBrand: transactionDict["paymentBrand"]!,
+                    cardBrand: transactionDict["cardBrand"]!,
                     cardHolder: transactionDict["cardHolder"]!,
                     cardNumber: transactionDict["cardNumber"]!,
                     cardExpiryMonth: transactionDict["cardExpiryMonth"]!,
@@ -118,9 +120,9 @@ class PaymentMobile: RCTEventEmitter {
         }
     }
 
-    private func createOPPTransaction(checkoutID: String, paymentBrand: String, cardHolder: String, cardNumber: String, cardExpiryMonth: String, cardExpiryYear: String, cardCVV: String) throws -> OPPTransaction? {
+    private func createOPPTransaction(checkoutID: String, cardBrand: String, cardHolder: String, cardNumber: String, cardExpiryMonth: String, cardExpiryYear: String, cardCVV: String) throws -> OPPTransaction? {
         do {
-            let params = try OPPCardPaymentParams.init(checkoutID: checkoutID, paymentBrand: paymentBrand, holder: cardHolder, number: cardNumber, expiryMonth: cardExpiryMonth, expiryYear: cardExpiryYear, cvv: cardCVV)
+            let params = try OPPCardPaymentParams.init(checkoutID: checkoutID, cardBrand: cardBrand, holder: cardHolder, number: cardNumber, expiryMonth: cardExpiryMonth, expiryYear: cardExpiryYear, cvv: cardCVV)
             params.shopperResultURL = self.urlScheme + "://payment"
             return OPPTransaction.init(paymentParams: params)
         } catch let error {
@@ -128,14 +130,14 @@ class PaymentMobile: RCTEventEmitter {
         }
     }
 
-    private func createOPPTransaction(checkoutID: String, tokenID: String, paymentBrand: String, cvv: String?) throws -> OPPTransaction? {
+    private func createOPPTransaction(checkoutID: String, tokenID: String, cardBrand: String, cvv: String?) throws -> OPPTransaction? {
         do {
             let params: OPPTokenPaymentParams
-            let tempPaymentBrand = paymentBrand != "" ? paymentBrand : "VISA"
+            let tempPaymentBrand = cardBrand != "" ? cardBrand : "VISA"
             if (cvv != nil) {
-                params = try OPPTokenPaymentParams.init(checkoutID: checkoutID, tokenID: tokenID, cardPaymentBrand: paymentBrand, cvv: cvv)
+                params = try OPPTokenPaymentParams.init(checkoutID: checkoutID, tokenID: tokenID, cardPaymentBrand: cardBrand, cvv: cvv)
             } else {
-                params = try OPPTokenPaymentParams.init(checkoutID: checkoutID, tokenID: tokenID, paymentBrand: tempPaymentBrand)
+                params = try OPPTokenPaymentParams.init(checkoutID: checkoutID, tokenID: tokenID, cardBrand: tempPaymentBrand)
             }
             params.shopperResultURL = self.urlScheme != "" ? self.urlScheme + "://payment" : "payments://paymnet";
 

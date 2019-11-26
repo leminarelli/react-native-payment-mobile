@@ -1,4 +1,4 @@
-# Payments Mobile for React Native
+# Payments Mobile for React Native - based on https://github.com/Codehesion-ZA/react-native-peach-mobile
 
 Payments Mobile component or React Native (iOS and Android)
 
